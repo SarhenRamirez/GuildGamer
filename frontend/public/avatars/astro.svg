@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+<defs><linearGradient id="bg-astro" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0e2b52"/><stop offset="1" stop-color="#04070f"/></linearGradient></defs>
+<rect width="128" height="128" fill="url(#bg-astro)"/>
+<circle cx="104" cy="22" r="34" fill="#fff" opacity=".07"/>
+<path d="M0 104l30-22 22 14 30-26 46 34v24H0z" fill="#000" opacity=".12"/>
+<g fill="#fff"><circle cx="14" cy="20" r="1.4"/><circle cx="30" cy="108" r="1.4"/><circle cx="110" cy="96" r="1.4"/><circle cx="20" cy="64" r="1.4"/><circle cx="116" cy="50" r="1.4"/></g><path d="M16 128c2-26 20-39 48-41 28 2 46 15 48 41z" fill="#e9edf2"/><path d="M48 90c4 8 10 12 16 12s12-4 16-12" fill="none" stroke="#ff8a3d" stroke-width="4" stroke-linecap="round"/><rect x="46" y="84" width="36" height="10" rx="4" fill="#c7cdd6"/><circle cx="64" cy="56" r="34" fill="#e9edf2"/><circle cx="64" cy="56" r="34" fill="none" stroke="#b9c1cc" stroke-width="3"/><rect x="38" y="38" width="52" height="38" rx="18" fill="#10233f"/><path d="M44 46c6-6 14-8 22-6" stroke="#7fc6ff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".8"/><circle cx="56" cy="58" r="3" fill="#2fe08a"/><circle cx="72" cy="58" r="3" fill="#2fe08a"/>
+</svg>

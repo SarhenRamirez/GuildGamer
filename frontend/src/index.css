@@ -1,0 +1,184 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+}
+
+@theme {
+  --color-ink-950: #0b0f12;
+  --color-ink-900: #11161a;
+  --color-ink-850: #161c21;
+  --color-ink-800: #1c2329;
+  --color-ink-700: #263039;
+  --color-ink-600: #36424d;
+  --color-online: #3fcf8e;
+  --color-brand-blue: #7aa7ff;
+  --color-brand-blue-deep: #2b5cb8;
+  --color-brand-red: #f05a5a;
+  --color-brand-red-soft: #f59a9a;
+  --color-brand-red-deep: #b42c35;
+  --color-brand-gold: #e0b34f;
+  --color-brand-gold-soft: #f0d08c;
+  --color-xbox: #3fcf8e;
+  --color-playstation: #4c8dff;
+  --color-nintendo: #ff4d5e;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root,
+[data-theme='green'] {
+  --accent: #2fe08a;
+  --accent-deep: #158a52;
+  --bg-hue: 0deg;
+}
+[data-theme='blue'] {
+  --accent: #4c8dff;
+  --accent-deep: #1f4fa8;
+  --bg-hue: 67deg;
+}
+[data-theme='red'] {
+  --accent: #ff4d5e;
+  --accent-deep: #b0232f;
+  --bg-hue: 203deg;
+}
+[data-theme='purple'] {
+  --accent: #a970ff;
+  --accent-deep: #6b3fc2;
+  --bg-hue: 113deg;
+}
+[data-theme='orange'] {
+  --accent: #ff8a3d;
+  --accent-deep: #b8551a;
+  --bg-hue: 233deg;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply min-h-screen bg-ink-950 text-slate-200 antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+  ::selection {
+    @apply bg-accent/30;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-white/7 bg-ink-900/80 shadow-lg shadow-black/20;
+  }
+  .input {
+    @apply w-full rounded-xl border border-white/8 bg-ink-850 px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 transition focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/15 disabled:opacity-50;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400;
+  }
+  .section-label {
+    @apply text-[11px] font-bold uppercase tracking-wider text-slate-400;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.12) transparent;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gg-logo {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    isolation: isolate;
+  }
+  .gg-logo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background: conic-gradient(
+      var(--color-xbox),
+      var(--color-playstation),
+      var(--color-nintendo),
+      var(--color-xbox)
+    );
+    animation: gg-spin 4s linear infinite;
+    z-index: -2;
+  }
+  .gg-logo::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 9999px;
+    background: var(--color-ink-950);
+    z-index: -1;
+  }
+
+  .sidebar-bg {
+    background: linear-gradient(to bottom, rgb(11 15 18 / 0.9), rgb(11 15 18 / 0.8));
+    backdrop-filter: blur(6px);
+  }
+
+  .app-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: url('/backgrounds/app.webp') center / cover no-repeat;
+    filter: hue-rotate(var(--bg-hue)) saturate(1.1);
+  }
+  .app-backdrop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 70% at 55% 50%, rgb(11 15 18 / 0.8), rgb(11 15 18 / 0.55));
+  }
+
+  .hero-art {
+    background: url('/backgrounds/hero.webp') right center / cover no-repeat;
+    filter: hue-rotate(var(--bg-hue)) saturate(1.1);
+  }
+
+  .hero-bg {
+    background-image:
+      radial-gradient(ellipse 60% 90% at 85% 40%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+      radial-gradient(ellipse 40% 60% at 100% 100%, color-mix(in srgb, var(--color-playstation) 14%, transparent), transparent 70%),
+      linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+    background-size: auto, auto, 28px 28px, 28px 28px;
+  }
+}
+
+@keyframes gg-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+.animate-toast {
+  animation: toast-in 0.25s ease-out;
+}
+
+@keyframes speaking {
+  0%, 100% { box-shadow: 0 0 0 2px var(--accent); }
+  50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent); }
+}
+.speaking-ring {
+  animation: speaking 1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-toast, .speaking-ring, .gg-logo::before { animation: none; }
+}

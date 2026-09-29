@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+<defs><linearGradient id="bg-knight" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b5310"/><stop offset="1" stop-color="#1d1604"/></linearGradient></defs>
+<rect width="128" height="128" fill="url(#bg-knight)"/>
+<circle cx="104" cy="22" r="34" fill="#fff" opacity=".07"/>
+<path d="M0 104l30-22 22 14 30-26 46 34v24H0z" fill="#000" opacity=".12"/>
+<path d="M16 128c2-26 20-39 48-41 28 2 46 15 48 41z" fill="#8a8f98"/><path d="M48 90c4 8 10 12 16 12s12-4 16-12" fill="none" stroke="#e0b34f" stroke-width="4" stroke-linecap="round"/><path d="M36 60c0-24 12-38 28-38s28 14 28 38v18c0 4-4 8-8 8H44c-4 0-8-4-8-8z" fill="#b8bec7"/><path d="M36 60c0-24 12-38 28-38" fill="none" stroke="#fff" stroke-width="3" opacity=".35"/><rect x="42" y="54" width="44" height="7" rx="3" fill="#15181c"/><path d="M64 62v20" stroke="#8a8f98" stroke-width="3"/><g fill="#15181c"><rect x="50" y="68" width="2" height="6" rx="1"/><rect x="74" y="68" width="2" height="6" rx="1"/><rect x="54" y="70" width="2" height="6" rx="1"/><rect x="70" y="70" width="2" height="6" rx="1"/><rect x="58" y="68" width="2" height="6" rx="1"/><rect x="66" y="68" width="2" height="6" rx="1"/></g><path d="M64 22c8-14 22-14 28-8-10 0-18 4-22 12z" fill="#e23b4a"/>
+</svg>
