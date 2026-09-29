@@ -1,0 +1,80 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink-950: #101216;
+  --color-ink-900: #16191e;
+  --color-ink-850: #1b1f25;
+  --color-ink-800: #21252c;
+  --color-ink-700: #2a2f37;
+  --color-ink-600: #3a414c;
+  --color-brand-green: #3fcf8e;
+  --color-brand-green-deep: #1f7a52;
+  --color-brand-blue: #7aa7ff;
+  --color-brand-blue-deep: #2b5cb8;
+  --color-brand-red: #f05a5a;
+  --color-brand-red-soft: #f59a9a;
+  --color-brand-red-deep: #b42c35;
+  --color-brand-gold: #d4a94e;
+  --color-brand-gold-soft: #e6c98a;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply min-h-screen bg-ink-950 text-slate-200 antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-green;
+  }
+  ::selection {
+    @apply bg-brand-green/30;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-white/6 bg-ink-900;
+  }
+  .input {
+    @apply w-full rounded-xl border border-white/8 bg-ink-850 px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 transition focus:border-brand-green/60 focus:outline-none focus:ring-2 focus:ring-brand-green/15 disabled:opacity-50;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400;
+  }
+  .section-label {
+    @apply text-[11px] font-bold uppercase tracking-wider text-slate-400;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.12) transparent;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+.animate-toast {
+  animation: toast-in 0.25s ease-out;
+}
+
+@keyframes speaking {
+  0%, 100% { box-shadow: 0 0 0 2px var(--color-brand-green); }
+  50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand-green) 45%, transparent); }
+}
+.speaking-ring {
+  animation: speaking 1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-toast, .speaking-ring { animation: none; }
+}

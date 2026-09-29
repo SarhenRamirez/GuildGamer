@@ -1,0 +1,21 @@
+﻿services:
+  db:
+    image: postgres:17-alpine
+    container_name: gamezone-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gamezone
+      POSTGRES_PASSWORD: gamezone
+      POSTGRES_DB: gamezone
+    ports:
+      - '5433:5432'
+    volumes:
+      - gamezone-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U gamezone']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  gamezone-data:

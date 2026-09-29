@@ -1,0 +1,487 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+enum Availability {
+  AVAILABLE
+  AWAY
+  UNAVAILABLE
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  PRO
+}
+
+enum Platform {
+  PC
+  PLAYSTATION
+  XBOX
+  NINTENDO_SWITCH
+  MOBILE
+}
+
+enum CommunicationPreference {
+  TEXT
+  VOICE
+  BOTH
+}
+
+enum SessionStatus {
+  OPEN
+  FULL
+  IN_PROGRESS
+  FINISHED
+  CANCELLED
+}
+
+enum PostKind {
+  GENERAL
+  CLIP
+  ACHIEVEMENT
+  DEBATE
+}
+
+enum SessionKind {
+  CASUAL
+  TOURNAMENT
+}
+
+enum JoinMode {
+  AUTOMATIC
+  MANUAL
+}
+
+enum MemberStatus {
+  PENDING
+  INVITED
+  ACCEPTED
+  REJECTED
+  LEFT
+  KICKED
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  BLOCKED
+}
+
+enum NotificationType {
+  JOIN_REQUEST
+  JOIN_ACCEPTED
+  JOIN_REJECTED
+  MEMBER_JOINED
+  MEMBER_LEFT
+  NEW_MESSAGE
+  SESSION_UPDATED
+  SESSION_CANCELLED
+  SESSION_REMINDER
+  FRIEND_REQUEST
+  FRIEND_ACCEPTED
+  SESSION_INVITE
+  REVIEW_RECEIVED
+  POST_LIKED
+  POST_COMMENTED
+  PREMIUM_ACTIVATED
+  SYSTEM
+}
+
+enum ReviewTag {
+  GOOD_TEAMMATE
+  GOOD_COMMUNICATION
+  RESPECTFUL
+  SKILLED
+  PUNCTUAL
+}
+
+enum ReportReason {
+  SPAM
+  HARASSMENT
+  FAKE_ACCOUNT
+  INAPPROPRIATE_CONTENT
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+enum SubscriptionPlan {
+  FREE
+  PREMIUM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PAST_DUE
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id                      String                  @id @default(uuid())
+  email                   String                  @unique
+  username                String                  @unique
+  passwordHash            String?
+  authProvider            AuthProvider            @default(LOCAL)
+  googleId                String?                 @unique
+  role                    Role                    @default(USER)
+  avatarUrl               String?
+  bio                     String?                 @db.VarChar(500)
+  skillLevel              SkillLevel              @default(BEGINNER)
+  languages               String[]
+  availability            Availability            @default(UNAVAILABLE)
+  communicationPreference CommunicationPreference @default(BOTH)
+  isBanned                Boolean                 @default(false)
+  bannerUrl               String?
+  accentColor             String?
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+
+  games              UserGame[]
+  createdSessions    GameSession[]   @relation("SessionCreator")
+  sessionMemberships SessionMember[]
+  messagesSent       Message[]       @relation("MessageSender")
+  messagesReceived   Message[]       @relation("MessageRecipient")
+  friendshipsSent    Friendship[]    @relation("FriendshipRequester")
+  friendshipsRecv    Friendship[]    @relation("FriendshipAddressee")
+  posts              Post[]
+  files              File[]
+  notifications      Notification[]
+  reviewsGiven       Review[]        @relation("ReviewAuthor")
+  reviewsReceived    Review[]        @relation("ReviewTarget")
+  reportsFiled       Report[]        @relation("ReportReporter")
+  reportsAgainst     Report[]        @relation("ReportTargetUser")
+  reportsResolved    Report[]        @relation("ReportResolver")
+  subscription       Subscription?
+  payments           Payment[]
+  ownedVoiceChannels VoiceChannel[]
+  postLikes          PostLike[]
+  postComments       PostComment[]
+
+  @@map("users")
+}
+
+model Game {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  slug      String     @unique
+  coverUrl  String?
+  genre     String
+  platforms Platform[]
+  tags      String[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  players  UserGame[]
+  sessions GameSession[]
+  posts    Post[]
+
+  @@map("games")
+}
+
+model UserGame {
+  userId     String
+  gameId     String
+  platform   Platform
+  gamerTag   String?
+  skillLevel SkillLevel?
+  rank       String?     @db.VarChar(40)
+  role       String?     @db.VarChar(40)
+  isFavorite Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@id([userId, gameId, platform])
+  @@map("user_games")
+}
+
+model GameSession {
+  id             String        @id @default(uuid())
+  title          String        @db.VarChar(100)
+  description    String?       @db.VarChar(1000)
+  gameId         String
+  creatorId      String
+  platform       Platform
+  kind           SessionKind   @default(CASUAL)
+  mode           String?
+  maxPlayers     Int
+  skillLevel     SkillLevel
+  language       String?
+  micRequired    Boolean       @default(false)
+  joinMode       JoinMode      @default(MANUAL)
+  status         SessionStatus @default(OPEN)
+  startsAt       DateTime
+  endsAt         DateTime?
+  joinInfo       String?
+  reminderSentAt DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  game         Game            @relation(fields: [gameId], references: [id])
+  creator      User            @relation("SessionCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  members      SessionMember[]
+  messages     Message[]
+  voiceChannel VoiceChannel?
+  reviews      Review[]
+  reports      Report[]
+
+  @@index([gameId, platform, status, startsAt])
+  @@index([startsAt, status])
+  @@map("game_sessions")
+}
+
+model SessionMember {
+  sessionId String
+  userId    String
+  status    MemberStatus @default(PENDING)
+  joinedAt  DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, userId])
+  @@index([userId, status])
+  @@map("session_members")
+}
+
+model Message {
+  id          String    @id @default(uuid())
+  content     String    @db.VarChar(2000)
+  senderId    String
+  sessionId   String?
+  recipientId String?
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  sender    User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  session   GameSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  recipient User?        @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  reports   Report[]
+
+  @@index([sessionId, createdAt])
+  @@index([senderId, recipientId, createdAt])
+  @@map("messages")
+}
+
+model VoiceChannel {
+  id         String    @id @default(uuid())
+  name       String
+  sessionId  String?   @unique
+  ownerId    String?
+  persistent Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  closedAt   DateTime?
+
+  session GameSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  owner   User?        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@map("voice_channels")
+}
+
+model Friendship {
+  id          String           @id @default(uuid())
+  requesterId String
+  addresseeId String
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  requester User @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee User @relation("FriendshipAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+  @@map("friendships")
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  authorId  String
+  kind      PostKind @default(GENERAL)
+  gameId    String?
+  content   String?  @db.VarChar(2000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  game     Game?         @relation(fields: [gameId], references: [id], onDelete: SetNull)
+  files    File[]
+  reports  Report[]
+  likes    PostLike[]
+  comments PostComment[]
+
+  @@index([authorId, createdAt])
+  @@index([kind, createdAt])
+  @@map("posts")
+}
+
+model PostLike {
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@map("post_likes")
+}
+
+model PostComment {
+  id        String   @id @default(uuid())
+  postId    String
+  authorId  String
+  content   String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+  @@map("post_comments")
+}
+
+model File {
+  id         String   @id @default(uuid())
+  ownerId    String
+  postId     String?
+  url        String
+  storageKey String   @unique
+  mimeType   String
+  sizeBytes  Int
+  createdAt  DateTime @default(now())
+
+  owner User  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  post  Post? @relation(fields: [postId], references: [id], onDelete: SetNull)
+
+  @@map("files")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String?
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+  @@map("notifications")
+}
+
+model Review {
+  id        String      @id @default(uuid())
+  sessionId String
+  authorId  String
+  targetId  String
+  stars     Int
+  tags      ReviewTag[]
+  comment   String?     @db.VarChar(500)
+  createdAt DateTime    @default(now())
+
+  session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  author  User        @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  target  User        @relation("ReviewTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, authorId, targetId])
+  @@index([targetId])
+  @@map("reviews")
+}
+
+model Report {
+  id              String       @id @default(uuid())
+  reporterId      String
+  reason          ReportReason
+  details         String?      @db.VarChar(1000)
+  status          ReportStatus @default(OPEN)
+  targetUserId    String?
+  targetSessionId String?
+  targetMessageId String?
+  targetPostId    String?
+  resolvedById    String?
+  resolutionNote  String?      @db.VarChar(1000)
+  resolvedAt      DateTime?
+  createdAt       DateTime     @default(now())
+
+  reporter      User         @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  targetUser    User?        @relation("ReportTargetUser", fields: [targetUserId], references: [id], onDelete: SetNull)
+  targetSession GameSession? @relation(fields: [targetSessionId], references: [id], onDelete: SetNull)
+  targetMessage Message?     @relation(fields: [targetMessageId], references: [id], onDelete: SetNull)
+  targetPost    Post?        @relation(fields: [targetPostId], references: [id], onDelete: SetNull)
+  resolvedBy    User?        @relation("ReportResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@map("reports")
+}
+
+model Subscription {
+  id                 String             @id @default(uuid())
+  userId             String             @unique
+  plan               SubscriptionPlan   @default(FREE)
+  status             SubscriptionStatus @default(ACTIVE)
+  providerCustomerId String?
+  providerSubId      String?            @unique
+  currentPeriodEnd   DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@map("subscriptions")
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  userId            String
+  subscriptionId    String?
+  amountCents       Int
+  currency          String        @default("USD") @db.Char(3)
+  status            PaymentStatus @default(PENDING)
+  provider          String        @default("mock")
+  providerPaymentId String?       @unique
+  createdAt         DateTime      @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@map("payments")
+}

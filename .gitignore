@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.tsbuildinfo
+
+backend/src/generated/
+
+.env
+.env.prod
+
+uploads/
+
+*.log
+.DS_Store
+.idea/
